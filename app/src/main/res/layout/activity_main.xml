@@ -20,6 +20,11 @@
         <android.support.v7.widget.AppCompatButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/btnPrev"
+            android:text="Previous"/>
+        <android.support.v7.widget.AppCompatButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:id="@+id/btnStart"
             android:text="Start"/>
         <android.support.v7.widget.AppCompatButton
@@ -27,6 +32,11 @@
             android:layout_height="wrap_content"
             android:id="@+id/btnStop"
             android:text="Stop"/>
+        <android.support.v7.widget.AppCompatButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btnNext"
+            android:text="Next"/>
     </android.support.v7.widget.LinearLayoutCompat>
 
 </android.support.v7.widget.LinearLayoutCompat>
