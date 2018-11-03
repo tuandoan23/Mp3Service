@@ -23,8 +23,6 @@ import butterknife.Unbinder;
 public class MainActivity extends AppCompatActivity {
 
     private Unbinder unbinder;
-    private ForegroundService foregroundService;
-    private boolean isBound = false;
 
     @BindView(R.id.btnStart)
     AppCompatButton btnStart;
@@ -32,8 +30,12 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.btnStop)
     AppCompatButton btnStop;
 
-    @BindView(R.id.tvName)
-    AppCompatTextView tvName;
+    @OnClick(R.id.btnShuffle)
+    void shuffle(){
+        Intent shuffleIntent = new Intent(MainActivity.this, ForegroundService.class);
+        shuffleIntent.setAction(Utils.SHUFFLE_ACTION);
+        startService(shuffleIntent);
+    }
 
     @OnClick(R.id.btnStart)
     void start(){

@@ -1,22 +1,28 @@
 package com.example.mp3service;
 
+import android.graphics.Bitmap;
+
+import java.util.ArrayList;
+
 public class Song {
     private String title;
-    private String composer;
     private String artist;
+    private String genre;
+    private String album;
     private String duration;
+    private Bitmap image;
     private String fileName;
-
 
     public Song() {
     }
 
-    public Song(String title, String composer, String artist, String duration, String fileName) {
-
+    public Song(String title, String artist, String genre, String album, String duration, Bitmap image, String fileName) {
         this.title = title;
-        this.composer = composer;
         this.artist = artist;
+        this.genre = genre;
+        this.album = album;
         this.duration = duration;
+        this.image = image;
         this.fileName = fileName;
     }
 
@@ -28,14 +34,6 @@ public class Song {
         this.title = title;
     }
 
-    public String getComposer() {
-        return composer;
-    }
-
-    public void setComposer(String composer) {
-        this.composer = composer;
-    }
-
     public String getArtist() {
         return artist;
     }
@@ -44,12 +42,36 @@ public class Song {
         this.artist = artist;
     }
 
+    public String getGenre() {
+        return genre;
+    }
+
+    public void setGenre(String genre) {
+        this.genre = genre;
+    }
+
+    public String getAlbum() {
+        return album;
+    }
+
+    public void setAlbum(String album) {
+        this.album = album;
+    }
+
     public String getDuration() {
         return duration;
     }
 
     public void setDuration(String duration) {
         this.duration = duration;
+    }
+
+    public Bitmap getImage() {
+        return image;
+    }
+
+    public void setImage(Bitmap image) {
+        this.image = image;
     }
 
     public String getFileName() {

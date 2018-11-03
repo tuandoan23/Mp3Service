@@ -8,6 +8,7 @@ public class Utils {
     public static final String PLAY_ACTION = "PLAY";
     public static final String NEXT_ACTION = "NEXT";
     public static final String PRE_ACTION = "PREVIOUS";
+    public static final String SHUFFLE_ACTION = "SHUFFLE";
     public static final int ID = 111;
     public static final int NOTIFICATION = 999;
 }
