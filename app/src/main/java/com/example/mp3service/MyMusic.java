@@ -21,7 +21,6 @@ public class MyMusic implements MediaPlayer.OnSeekCompleteListener, MediaPlayer.
     public ArrayList<Song> listSong;
     public ArrayList<File> listFile;
     public static int index = 0;
-    public int currentPosition;
     private Context context;
     private int seek = 0;
 
