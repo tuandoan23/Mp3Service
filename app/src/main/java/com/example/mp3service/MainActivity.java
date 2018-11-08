@@ -1,19 +1,9 @@
 package com.example.mp3service;
 
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.IBinder;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatButton;
-import android.support.v7.widget.AppCompatTextView;
-import android.util.Log;
-import android.widget.RemoteViews;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -30,6 +20,12 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.btnStop)
     AppCompatButton btnStop;
 
+    @BindView(R.id.btnNext)
+    AppCompatButton btnNext;
+
+    @BindView(R.id.btnPrev)
+    AppCompatButton btnPrev;
+
     @OnClick(R.id.btnShuffle)
     void shuffle(){
         Intent shuffleIntent = new Intent(MainActivity.this, ForegroundService.class);
@@ -39,6 +35,9 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.btnStart)
     void start(){
+        btnStop.setEnabled(true);
+        btnNext.setEnabled(true);
+        btnPrev.setEnabled(true);
         Intent startIntent = new Intent(MainActivity.this, ForegroundService.class);
         startIntent.setAction(Utils.START_ACTION);
         startService(startIntent);
@@ -68,6 +67,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         unbinder = ButterKnife.bind(this);
+        btnStop.setEnabled(false);
+        btnNext.setEnabled(false);
+        btnPrev.setEnabled(false);
     }
 
     @Override
