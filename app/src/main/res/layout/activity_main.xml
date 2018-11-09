@@ -1,53 +1,162 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
     android:orientation="vertical">
+    <com.cleveroad.audiovisualization.GLAudioVisualizationView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/visualizer_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:av_bubblesSize="@dimen/bubble_size"
+        app:av_bubblesRandomizeSizes="true"
+        app:av_wavesHeight="@dimen/wave_height"
+        app:av_wavesFooterHeight="@dimen/footer_height"
+        app:av_wavesCount="8"
+        app:av_layersCount="5"
+        app:av_backgroundColor="@color/color_bg">
+    </com.cleveroad.audiovisualization.GLAudioVisualizationView>
     <android.support.v7.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/llTimer"
+        android:gravity="right"
         android:orientation="horizontal"
-        android:gravity="center">
-        <android.support.v7.widget.AppCompatButton
-            android:layout_width="wrap_content"
+        android:padding="10dp">
+        <android.support.v7.widget.LinearLayoutCompat
+            android:layout_width="0dp"
+            android:layout_weight="0.9"
             android:layout_height="wrap_content"
-            android:id="@+id/btnPrev"
-            android:text="Previous"/>
-        <android.support.v7.widget.AppCompatButton
-            android:layout_width="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginLeft="30dp">
+            <android.support.v7.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.6"
+                android:id="@+id/tvSongTitle"
+                android:textAlignment="center"
+                android:textColor="#FFF"
+                android:textSize="20dp"
+                android:ellipsize="marquee"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:singleLine="true"
+                android:scrollHorizontally="true"/>
+            <android.support.v7.widget.AppCompatTextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.4"
+                android:id="@+id/tvArtist"
+                android:textAlignment="center"
+                android:textColor="#FFF"
+                android:textSize="15dp"/>
+        </android.support.v7.widget.LinearLayoutCompat>
+        <ImageButton
+            android:id="@+id/ibTimer"
+            android:layout_weight="0.1"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:id="@+id/btnStart"
-            android:text="Start"/>
-        <android.support.v7.widget.AppCompatButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/btnStop"
-            android:text="Stop"/>
-        <android.support.v7.widget.AppCompatButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/btnNext"
-            android:text="Next"/>
+            android:src="@drawable/ic_timer"
+            android:background="@null"
+            android:layout_gravity="center"/>
     </android.support.v7.widget.LinearLayoutCompat>
     <android.support.v7.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center">
-        <android.support.v7.widget.AppCompatButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/btnShuffle"
-            android:text="Shuffle"/>
+        android:orientation="vertical"
+        android:layout_below="@+id/llTimer">
+        <android.support.v7.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="350dp"
+            android:padding="40dp"
+            android:gravity="center">
+            <android.support.v7.widget.AppCompatImageView
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:id="@+id/ivSongImage"/>
+        </android.support.v7.widget.LinearLayoutCompat>
     </android.support.v7.widget.LinearLayoutCompat>
-
-    <ListView
+    <android.support.v7.widget.LinearLayoutCompat
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-    </ListView>
-
-</android.support.v7.widget.LinearLayoutCompat>
+        android:layout_height="50dp"
+        android:layout_above="@+id/layoutControl"
+        android:id="@+id/llTiming"
+        android:orientation="vertical">
+        <android.support.v7.widget.AppCompatSeekBar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/seekBar"/>
+        <android.support.v7.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_weight="0.5"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textAlignment="textStart"
+                android:paddingLeft="20dp"
+                android:id="@+id/tvCurrentDuration"
+                android:textColor="#FFF"
+                android:textSize="15dp"/>
+            <TextView
+                android:id="@+id/tvDuration"
+                android:layout_weight="0.5"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textAlignment="textEnd"
+                android:textSize="15dp"
+                android:textColor="#FFF"
+                android:paddingRight="20dp"/>
+        </android.support.v7.widget.LinearLayoutCompat>
+    </android.support.v7.widget.LinearLayoutCompat>
+    <android.support.v7.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/layoutControl"
+        android:layout_marginBottom="20dp">
+        <ImageButton
+            android:id="@+id/ibLoop"
+            android:layout_weight="0.2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_loop"
+            android:background="@null"/>
+        <ImageButton
+            android:id="@+id/ibPre"
+            android:layout_weight="0.2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_pre"
+            android:background="@null"/>
+        <ImageButton
+            android:id="@+id/ibPlay"
+            android:layout_weight="0.2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_play"
+            android:background="@null"/>
+        <ImageButton
+            android:id="@+id/ibNext"
+            android:layout_weight="0.2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_next"
+            android:background="@null"/>
+        <ImageButton
+            android:id="@+id/ibShuffle"
+            android:layout_weight="0.2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_shuffle"
+            android:background="@null"/>
+    </android.support.v7.widget.LinearLayoutCompat>
+</RelativeLayout>

@@ -14,6 +14,9 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.time.Duration;
+import java.util.Calendar;
+
 public class ForegroundService extends Service {
     private MyMusic myMusic;
     private Notification notification;
@@ -26,6 +29,8 @@ public class ForegroundService extends Service {
     private PendingIntent pendingShuffleIntent;
     private Notification.Action playAction;
     private Notification.Action pauseAction;
+    private final Handler timerHandler = new Handler();
+    private final Handler notificationHandler = new Handler();
     public ForegroundService() {
     }
 
@@ -53,16 +58,17 @@ public class ForegroundService extends Service {
             notification = showNotification(pauseAction, "00:00");
             nm.notify(Utils.NOTIFICATION, notification);
             handleAction(intent);
-            final Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
+            notificationHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
+                    int currentPosition = myMusic.getCurrentPosition();
                     if (myMusic.isPlaying()){
-                        nm.notify(Utils.NOTIFICATION, showNotification(pauseAction, durationToTimer(String.valueOf(myMusic.getCurrentPosition()))));
+                        nm.notify(Utils.NOTIFICATION, showNotification(pauseAction, Utils.durationToTimer(String.valueOf(currentPosition))));
                     } else {
-                        nm.notify(Utils.NOTIFICATION, showNotification(playAction, durationToTimer(String.valueOf(myMusic.getCurrentPosition()))));
+                        nm.notify(Utils.NOTIFICATION, showNotification(playAction, Utils.durationToTimer(String.valueOf(currentPosition))));
                     }
-                    handler.postDelayed(this, 1000);
+                    EventBus.getDefault().post(new DurationEvent(String.valueOf(currentPosition), currentPosition));
+                    notificationHandler.postDelayed(this, 1000);
                 }
             }, 1000);
         }
@@ -104,29 +110,39 @@ public class ForegroundService extends Service {
             myMusic.pre();
             nm.notify(Utils.NOTIFICATION, showNotification(pauseAction, "00:00"));
         } else if (intent.getAction().equals(Utils.PLAY_ACTION)) {
+            EventBus.getDefault().post(new NotiStatusEvent(1));
             myMusic.playResume();
-            notification.actions[1] = pauseAction;
             nm.notify(Utils.NOTIFICATION, showNotification(pauseAction, String.valueOf(myMusic.getCurrentPosition())));
         } else if (intent.getAction().equals(Utils.PAUSE_ACTION)){
+            EventBus.getDefault().post(new NotiStatusEvent(0));
             myMusic.pause();
-            notification.actions[1] = playAction;
             nm.notify(Utils.NOTIFICATION, showNotification(playAction, String.valueOf(myMusic.getCurrentPosition())));
         } else if (intent.getAction().equals(Utils.NEXT_ACTION)) {
             myMusic.next();
             nm.notify(Utils.NOTIFICATION, showNotification(pauseAction, "00:00"));
         } else if (intent.getAction().equals(Utils.STOP_ACTION)) {
-            stopForeground(true);
-            stopSelf();
+            stopService();
         } else if (intent.getAction().equals(Utils.SHUFFLE_ACTION)){
             myMusic.shuffleList();
         }
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onSongStatusEvent(SongStatusEvent event) {
+        if (event.status == 1){
+            myMusic.playResume();
+            nm.notify(Utils.NOTIFICATION, showNotification(pauseAction, String.valueOf(myMusic.getCurrentPosition())));
+        } else {
+            myMusic.pause();
+            nm.notify(Utils.NOTIFICATION, showNotification(playAction, String.valueOf(myMusic.getCurrentPosition())));
+        }
+    };
+
     private Notification showNotification(Notification.Action action, String timer){
         Notification.Builder notificationBuilder = new Notification.Builder(this)
                 .setContentTitle(myMusic.getCurrentSong().getTitle())
                 .setContentText(myMusic.getCurrentSong().getArtist())
-                .setSubText(timer + " | " + durationToTimer(myMusic.getCurrentSong().getDuration()))
+                .setSubText(timer + " | " + Utils.durationToTimer(myMusic.getCurrentSong().getDuration()))
                 .setSmallIcon(R.drawable.ic_play)
                 .setContentIntent(pendingIntent)
                 .setOngoing(true)
@@ -141,44 +157,57 @@ public class ForegroundService extends Service {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onCompleteEvent(CompleteEvent event) {
         if (event.isComplete && !myMusic.mediaIsNull()){
-            nm.notify(Utils.NOTIFICATION, showNotification(pauseAction, durationToTimer(String.valueOf(myMusic.getCurrentPosition()))));
+            nm.notify(Utils.NOTIFICATION, showNotification(pauseAction, Utils.durationToTimer(String.valueOf(myMusic.getCurrentPosition()))));
         }
     };
 
-    public String durationToTimer(String duration) {
-        long milliseconds = Long.parseLong(duration);
-        String finalTimerString = "";
-        String secondsString = "";
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onTimerEvent(final TimerEvent event) {
+        final Calendar timeEnd = getTimeEnd(event.timer);
+        timerHandler.removeCallbacksAndMessages(null);
+        timerHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Calendar now = Calendar.getInstance();
+                if (now.getTime().getTime() > timeEnd.getTime().getTime()){
+                    stopService();
+                }
+                timerHandler.postDelayed(this, 1000);
+            }
+        }, 1000);
+    };
 
-        // Convert total duration into time
-        int hours = (int) (milliseconds / (1000 * 60 * 60));
-        int minutes = (int) (milliseconds % (1000 * 60 * 60)) / (1000 * 60);
-        int seconds = (int) ((milliseconds % (1000 * 60 * 60)) % (1000 * 60) / 1000);
-        // Add hours if there
-        if (hours > 0) {
-            finalTimerString = hours + ":";
-        }
-
-        // Prepending 0 to seconds if it is one digit
-        if (seconds < 10) {
-            secondsString = "0" + seconds;
+    public Calendar getTimeEnd(int timer){
+        int hours;
+        int minutes;
+        if (timer >= 60){
+            hours = timer/60;
+            minutes = timer - hours* 60;
         } else {
-            secondsString = "" + seconds;
+            hours = 0;
+            minutes = timer;
         }
-
-        finalTimerString = finalTimerString + minutes + ":" + secondsString;
-
-        // return timer string
-        return finalTimerString;
+        Calendar now = Calendar.getInstance();
+        Calendar tmp = (Calendar) now.clone();
+        tmp.add(Calendar.HOUR_OF_DAY, hours);
+        tmp.add(Calendar.MINUTE, minutes);
+        Calendar timeEnd = tmp;
+        return  timeEnd;
     }
 
     @Override
     public void onDestroy() {
+        stopService();
+        super.onDestroy();
+    }
+
+    public void stopService(){
         stopForeground(true);
         stopSelf();
+        timerHandler.removeCallbacksAndMessages(null);
+        notificationHandler.removeCallbacksAndMessages(null);
         nm.cancel(Utils.NOTIFICATION);
         EventBus.getDefault().unregister(this);
         myMusic.stop();
-        super.onDestroy();
     }
 }

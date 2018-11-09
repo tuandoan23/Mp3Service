@@ -12,6 +12,7 @@ import android.util.Log;
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
@@ -62,9 +63,16 @@ public class MyMusic implements MediaPlayer.OnSeekCompleteListener, MediaPlayer.
 
     public void playSound(final Context context, final String fileName) {
         EventBus.getDefault().post(new CompleteEvent(true));
+        EventBus.getDefault().post(new SongEvent(getCurrentSong()));
         seek = 0;
         mediaPlayer = new MediaPlayer();
         mediaPlayer = MediaPlayer.create(context, Uri.parse(fileName));
+//        try {
+//            mediaPlayer.setDataSource("https://www.sample-videos.com/audio/mp3/wave.mp3");
+//            mediaPlayer.prepare();
+//        } catch (IOException e){
+//            e.printStackTrace();
+//        }
         mediaPlayer.start();
         mediaPlayer.setOnSeekCompleteListener(this);
         mediaPlayer.setOnCompletionListener(this);
@@ -210,8 +218,13 @@ public class MyMusic implements MediaPlayer.OnSeekCompleteListener, MediaPlayer.
     public void shuffleList() {
         long seed = System.nanoTime();
         Collections.shuffle(listSong, new Random(seed));
-        index = 0;
-        playMedia();
+        for (int i = 0; i < listSong.size(); i++){
+            if (listSong.get(i).getFileName().equals(getCurrentSong().getFileName())){
+                index = i;
+            }
+        }
+//        index = 0;
+//        playMedia();
     }
 
     public boolean mediaIsNull(){
